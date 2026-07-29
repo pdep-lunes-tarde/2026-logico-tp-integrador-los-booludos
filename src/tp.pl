@@ -5,9 +5,9 @@ habitante(voll, ende, 1200, enano).
 habitante(serie, weise, 500, elfo).
 habitante(fern, weise, 1370, humano).
 habitante(stark, riegel, 1368, humano).
-habitante(lawie,aurbest, 1372, humano).
+habitante(lawine,aurbest, 1372, humano).
 habitante(kanne, weise, 1365, humano).
-habitante(wirbel, weise, 1365, humano).
+habitante(wirbel, weise, 1350, humano).
 habitante(lernen, aurbest, 1315, humano).
 habitante(frieren, weise, 100, elfo).
 habitante(eisen, riegel, 1150, enano).
@@ -72,8 +72,6 @@ test(voll_esta_vivo_en_1551, fail):-
 test(serie_esta_viva_en_5000):-
     estaVivo(serie, 5000).
 
-:- end_tests(tpIntegrador).
-
 % Tests 2
 
 test(no_recuerda_destruir_aura_en_1380_, fail):-
@@ -96,3 +94,5 @@ test(recuerda_rescatar_hermana_en_1430):-
 
 test(no_recuerda_rescatar_hermana_en_1440, fail):-
     recuerda(wirbel, rescatarHermanaWirbel, 1440).
+
+:- end_tests(tpIntegrador).
