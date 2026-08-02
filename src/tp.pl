@@ -50,7 +50,24 @@ recuerda(Persona, Hazania, Anio):-
     Anio =< AnioConoce + Paginas,
     estaVivo(Persona, Anio).
 
-% Tests
+
+distintosDetalles(Personas1,Personas2,_,_):-
+    Personas1 \= Personas2.
+distintosDetalles(_,_,Lugar1,Lugar2):-
+    Lugar1 \= Lugar2.
+
+estaCorroborada(Hazania):-
+    \+ (conoce(_, _, _, Hazania, Personas1, Lugar1),
+        conoce(_, _, _, Hazania, Personas2, Lugar2),
+        distintosDetalles(Personas1,Personas2,Lugar1,Lugar2)
+        ).
+
+
+estaOlvidada(Hazania,Anio):-
+    \+ recuerda(_,Hazania,Anio).
+
+
+% Tests 1
 
 :- begin_tests(tpIntegrador, []).
 
@@ -94,5 +111,17 @@ test(recuerda_rescatar_hermana_en_1430):-
 
 test(no_recuerda_rescatar_hermana_en_1440, fail):-
     recuerda(wirbel, rescatarHermanaWirbel, 1440).
+
+test(una_hazania_que_contiene_mismo_detalles_esta_corroborada):-
+    estaCorroborada(rescatarHermanaWirbel).
+
+test(una_hazania_que_contiene_distintos_detalles_no_esta_corroborada, fail):-
+    estaCorroborada(destruirAura).
+
+test(una_hazania_que_nadie_recuerda_esta_olvidada):-
+    estaOlvidada(destruirAura,1460).
+
+test(una_hazania_que_alguien_recuerda_no_esta_olvidada):-
+    estaOlvidada(destruirAura,1440).
 
 :- end_tests(tpIntegrador).
