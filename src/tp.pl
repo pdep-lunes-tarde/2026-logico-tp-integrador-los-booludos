@@ -121,7 +121,7 @@ test(una_hazania_que_contiene_distintos_detalles_no_esta_corroborada, fail):-
 test(una_hazania_que_nadie_recuerda_esta_olvidada):-
     estaOlvidada(destruirAura,1460).
 
-test(una_hazania_que_alguien_recuerda_no_esta_olvidada):-
+test(una_hazania_que_alguien_recuerda_no_esta_olvidada,fail):-
     estaOlvidada(destruirAura,1440).
 
 :- end_tests(tpIntegrador).
