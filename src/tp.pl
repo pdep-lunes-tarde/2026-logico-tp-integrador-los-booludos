@@ -58,13 +58,13 @@ distintosDetalles(_,_,Lugar1,Lugar2):-
     Lugar1 \= Lugar2.
 
 estaCorroborada(Hazania):-
-    not (conoce(_, _, _, Hazania, Personas1, Lugar1),
+    \+ (conoce(_, _, _, Hazania, Personas1, Lugar1),
         conoce(_, _, _, Hazania, Personas2, Lugar2),
         distintosDetalles(Personas1,Personas2,Lugar1,Lugar2)
         ).
 
 estaOlvidada(Hazania,Anio):-
-    not recuerda(_,Hazania,Anio).
+    \+ recuerda(_,Hazania,Anio).
 
 % Punto 3
 
