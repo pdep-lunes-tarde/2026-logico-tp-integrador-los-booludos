@@ -58,13 +58,15 @@ distintosDetalles(_,_,Lugar1,Lugar2):-
     Lugar1 \= Lugar2.
 
 estaCorroborada(Hazania):-
-    \+ (conoce(_, _, _, Hazania, Personas1, Lugar1),
+    conoce(_,_,_,Hazania,_,_),
+    not((conoce(_, _, _, Hazania, Personas1, Lugar1),
         conoce(_, _, _, Hazania, Personas2, Lugar2),
         distintosDetalles(Personas1,Personas2,Lugar1,Lugar2)
-        ).
+        )).
 
 estaOlvidada(Hazania,Anio):-
-    \+ recuerda(_,Hazania,Anio).
+    conoce(_,_,_,Hazania,_,_),
+    not(recuerda(_,Hazania,Anio)).
 
 % Punto 3
 
@@ -116,86 +118,86 @@ estatuaEnBuenEstado(Estatua, Anio):-
 
 :- begin_tests(tpIntegrador, []).
 
-test(kanne_esta_viva_en_1370):-
+test("Un humano está vivo si el año consultado está dentro de su esperanza de vida"):-
     estaVivo(kanne, 1370).
 
-test(kanne_no_esta_viva_en_1300, fail):-
-    estaVivo(kanne,1300).
+test("Nadie está vivo en un año anterior a su fecha de nacimiento", fail):-
+    estaVivo(kanne, 1300).
 
-test(kanne_no_esta_viva_en_2000, fail):-
-    estaVivo(kanne,2000).
+test("Un humano fallece y ya no está vivo si el año supera su esperanza de vida", fail):-
+    estaVivo(kanne, 2000).
 
-test(voll_esta_vivo_en_1550):-
+test("Un enano está vivo si el año consultado está dentro de su extensa esperanza de vida"):-
     estaVivo(voll, 1550).
 
-test(voll_esta_vivo_en_1551, fail):-
-    estaVivo(voll,1551).
+test("Un enano no está vivo si el año supera su esperanza de vida máxima", fail):-
+    estaVivo(voll, 1551).
 
-test(serie_esta_viva_en_5000):-
+test("Un elfo es inmortal y está vivo en cualquier año posterior a su nacimiento"):-
     estaVivo(serie, 5000).
 
 % Tests 2
 
-test(no_recuerda_destruir_aura_en_1380_, fail):-
+test("Alguien no puede recordar una hazaña en un año anterior a haberla conocido", fail):-
     recuerda(lawine, destruirAura, 1380).
 
-test(recuerda_destruir_aura_en_1400):-
+test("Alguien recuerda una hazaña que conoció por una canción si aún no pasaron 15 años"):-
     recuerda(lawine, destruirAura, 1400).
 
-test(no_recuerda_destruir_aura_en_1410, fail):-
+test("Alguien olvida una hazaña conocida por una canción cuando pasan más de 15 años", fail):-
     recuerda(lawine, destruirAura, 1410).
 
-test(recuerda_destruir_aura_en_1450):-
+test("Alguien recuerda una hazaña de un libro si los años transcurridos no superan sus páginas"):-
     recuerda(voll, destruirAura, 1450).
 
-test(no_recuerda_destruir_aura_en_1460, fail):-
+test("Alguien olvida una hazaña de un libro cuando los años transcurridos superan sus páginas", fail):-
     recuerda(voll, destruirAura, 1460).
 
-test(recuerda_rescatar_hermana_en_1430):-
+test("Alguien recuerda una hazaña que presenció toda su vida mientras siga vivo"):-
     recuerda(wirbel, rescatarHermanaWirbel, 1430).
 
-test(no_recuerda_rescatar_hermana_en_1440, fail):-
+test("Nadie puede recordar una hazaña, aunque la haya presenciado, si ya falleció", fail):-
     recuerda(wirbel, rescatarHermanaWirbel, 1440).
 
-test(una_hazania_que_contiene_mismo_detalles_esta_corroborada):-
+test("Una hazaña está corroborada si todos los que la conocen coinciden en los detalles (personas y lugar)"):-
     estaCorroborada(rescatarHermanaWirbel).
 
-test(una_hazania_que_contiene_distintos_detalles_no_esta_corroborada, fail):-
+test("Una hazaña no está corroborada si hay contradicciones en los detalles entre quienes la conocen", fail):-
     estaCorroborada(destruirAura).
 
-test(una_hazania_que_nadie_recuerda_esta_olvidada):-
-    estaOlvidada(destruirAura,1460).
+test("Una hazaña está olvidada en un año particular si ninguna persona viva la recuerda"):-
+    estaOlvidada(destruirAura, 1460).
 
-test(una_hazania_que_alguien_recuerda_no_esta_olvidada,fail):-
-    estaOlvidada(destruirAura,1440).
+test("Una hazaña no está olvidada si al menos una persona viva aún la recuerda", fail):-
+    estaOlvidada(destruirAura, 1440).
 
 % Tests 3
 
-test(la_estatua_esta_en_buen_estado_por_su_antiguedad_reciente_o_por_el_mantenimiento):-
+test("Una estatua está en buen estado si es reciente respecto a su material o si recibió mantenimiento a tiempo"):-
     estatuaEnBuenEstado(elHeroeDelSur, 1360),
     estatuaEnBuenEstado(elEquipoDeHeroes, 1405).
  
-test(la_estatua_no_se_encuentra_en_buen_estado_sin_su_mantenimiento_ni_antiguedad_valida, fail):-
+test("Una estatua no está en buen estado si superó el tiempo máximo de su material sin recibir mantenimiento", fail):-
     estatuaEnBuenEstado(elEquipoDeHeroes, 1390),
     estatuaEnBuenEstado(elHeroeDelSur, 1375),
     estatuaEnBuenEstado(elEquipoDeHeroes, 1360).
  
-test(tal_persona_recuerda_una_hazania_conmemorada_con_un_dia_festivo_si_esta_vive_en_ese_pueblo):-
+test("Una persona recuerda una hazaña si vive en un pueblo con un día festivo que la conmemora"):-
     recuerda(fern, destruirReyDemonio, 1400).
  
-test(tal_persona_no_recuerda_una_hazania_conmemorada_en_un_pueblo_donde_esta_no_vive, fail):-
+test("Una persona no recuerda una hazaña por día festivo si este se celebra en un pueblo distinto al suyo", fail):-
     recuerda(voll, destruirReyDemonio, 1420).
  
-test(tal_persona_recuerda_una_hazania_conmemorada_por_una_estatua_si_esta_se_encuentra_en_buen_estado):-
+test("Una persona recuerda una hazaña si en su pueblo hay una estatua conmemorativa en buen estado"):-
     recuerda(lawine, destruirReyDemonio, 1400).
  
-test(tal_persona_no_recuerda_una_hazania_conmemorada_con_estatua_si_esta_se_encuentra_en_mal_estado, fail):-
+test("Una persona no recuerda una hazaña por estatua si esta se encuentra en mal estado", fail):-
     recuerda(lawine, destruirReyDemonio, 1390).
  
-test(tal_persona_conoce_una_conmemoracion_desde_su_inicio_si_esta_ya_habia_nacido):-
+test("Alguien conoce una conmemoración desde su inicio si ya había nacido cuando se instauró"):-
     recuerda(frieren, destruirReyDemonio, 1340).
  
-test(tal_persona_no_recuerda_una_conmemoracion_antes_de_que_esta_comience, fail):-
+test("Nadie puede recordar una conmemoración en un año anterior a que esta comience a celebrarse", fail):-
     recuerda(frieren, destruirReyDemonio, 1339).
 
 :- end_tests(tpIntegrador).
