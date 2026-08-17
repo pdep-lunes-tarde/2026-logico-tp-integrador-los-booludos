@@ -104,10 +104,11 @@ estatuaEnBuenEstado(Estatua, Anio):-
     aniosMaximoSinMantenimiento(Material, AniosMaximos),
     Anio - AnioConstruccion =< AniosMaximos.
 estatuaEnBuenEstado(Estatua, Anio):-
-    estatua(_, _, Estatua, _, AnioConstruccion),
+    estatua(_, Material, Estatua, _, AnioConstruccion),
     AnioConstruccion =< Anio,
+    aniosMaximoSinMantenimiento(Material, AniosMaximos),
     mantenimientoEstatua(Estatua, AnioMantenimiento),
-    AnioMantenimiento =< Anio.
+    Anio - AnioMantenimiento =< AniosMaximos.
 
 % Tests 1
 
