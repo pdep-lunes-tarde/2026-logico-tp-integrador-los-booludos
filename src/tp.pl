@@ -48,13 +48,9 @@ perdura(Persona,Hazania,Anio,AnioConoce):-
     dura(Tipo, AnioConoce, Anio).
 perdura(Persona,Hazania,Anio,AnioConoce):-
     habitante(Persona, Pueblo, _, _),
-    conmemoraFestivo(Pueblo, Hazania, AnioInicioConmemoracion),
-    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConoce).
-perdura(Persona,Hazania,Anio,AnioConoce):-
-    habitante(Persona, Pueblo, _, _),
-    estatua(Pueblo, _, Estatua, Hazania, AnioConstruccion),
-    anioEnQueConocioConmemoracion(Persona, AnioConstruccion, AnioConoce),
-    estatuaEnBuenEstado(Estatua, Anio).
+    conmemora(Pueblo, AnioInicioConmemoracion, Tipo, Hazania, _, _),
+    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConoce),
+    conmemoracionVigente(Tipo, Anio).
 
 recuerda(Persona, Hazania, Anio) :-
     perdura(Persona,Hazania,Anio,AnioConoce),
@@ -79,10 +75,9 @@ estaOlvidada(Hazania,Anio):-
 
 % Punto 3
 
-conmemoraFestivo(weise, destruirReyDemonio, 1340).
-
-estatua(auberst, bronce, elEquipoDeHeroes, destruirReyDemonio, 1370).
-estatua(auberst, marmol, elHeroeDelSur, destruirSchlatOmnisciente, 1340).
+conmemora(weise, 1340, festivo, destruirReyDemonio, [frieren, himmel, heiter, eisen], ende).
+conmemora(auberst, 1370, estatua(bronce, elEquipoDeHeroes), destruirReyDemonio, [frieren, himmel, heiter, eisen], ende).
+conmemora(auberst, 1340, estatua(marmol, elHeroeDelSur), destruirSchlatOmnisciente, [heroeDelSur], ende).
  
 mantenimientoEstatua(elEquipoDeHeroes, 1400).
 mantenimientoEstatua(elEquipoDeHeroes, 1450).
@@ -98,18 +93,21 @@ anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioNacimiento):
     habitante(Persona, _, AnioNacimiento, _),
     AnioNacimiento > AnioInicioConmemoracion.
 
-estatuaEnBuenEstado(Estatua, Anio):-
-    estatua(_, Material, Estatua, _, AnioConstruccion),
+conmemoracionVigente(festivo, _).
+conmemoracionVigente(estatua(_, NombreEstatua), Anio):-
+    estatuaEnBuenEstado(NombreEstatua, Anio).
+
+estatuaEnBuenEstado(NombreEstatua, Anio):-
+    conmemora(_, AnioConstruccion, estatua(Material, NombreEstatua), _, _, _),
     AnioConstruccion =< Anio,
     aniosMaximoSinMantenimiento(Material, AniosMaximos),
-    Anio - AnioConstruccion =< AniosMaximos.
-estatuaEnBuenEstado(Estatua, Anio):-
-    estatua(_, Material, Estatua, _, AnioConstruccion),
-    AnioConstruccion =< Anio,
-    aniosMaximoSinMantenimiento(Material, AniosMaximos),
-    mantenimientoEstatua(Estatua, AnioMantenimiento),
-    AnioMantenimiento =< Anio,
-    Anio - AnioMantenimiento =< AniosMaximos.
+    anioDeReferencia(NombreEstatua, AnioConstruccion, AnioReferencia),
+    AnioReferencia =< Anio,
+    Anio - AnioReferencia =< AniosMaximos.
+
+anioDeReferencia(_, AnioConstruccion, AnioConstruccion).
+anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
+    mantenimientoEstatua(NombreEstatua, AnioMantenimiento).
 
 % Tests 1
 
