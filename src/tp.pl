@@ -37,19 +37,28 @@ conoce(voll, 1400, libro(50) , destruirAura , [denken] , auberst).
 conoce(serie, 1335, libro(100) , destruirReyDemonio , [frieren, himmel , heiter, eisen] , ende).
 conoce(kanne, 1375, presencio , recuperarGatoPerdido , [himmel, frieren] , weise).
 
-recuerda(Persona, Hazania, Anio):-
-    conoce(Persona, AnioConoce, presencio , Hazania , _ , _ ),
+dura(presencio, _ ,_).
+dura(cancion, Anio, AnioActual):-
+    AnioActual =< Anio + 15.
+dura(libro(Paginas), Anio, AnioActual):-
+    AnioActual =< Anio + Paginas.
+
+perdura(Persona,Hazania,Anio,AnioConoce):-
+    conoce(Persona, AnioConoce, Tipo, Hazania, _, _),
+    dura(Tipo, AnioConoce, Anio).
+perdura(Persona,Hazania,Anio,AnioConoce):-
+    habitante(Persona, Pueblo, _, _),
+    conmemoraFestivo(Pueblo, Hazania, AnioInicioConmemoracion),
+    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConoce).
+perdura(Persona,Hazania,Anio,AnioConoce):-
+    habitante(Persona, Pueblo, _, _),
+    estatua(Pueblo, _, Estatua, Hazania, AnioConstruccion),
+    anioEnQueConocioConmemoracion(Persona, AnioConstruccion, AnioConoce),
+    estatuaEnBuenEstado(Estatua, Anio).
+
+recuerda(Persona, Hazania, Anio) :-
+    perdura(Persona,Hazania,Anio,AnioConoce),
     Anio >= AnioConoce,
-    estaVivo(Persona, Anio).
-recuerda(Persona, Hazania, Anio):-
-    conoce(Persona, AnioConoce, cancion , Hazania , _ , _),
-    Anio >= AnioConoce,
-    Anio =< AnioConoce + 15,
-    estaVivo(Persona, Anio).
-recuerda(Persona, Hazania, Anio):-
-    conoce(Persona, AnioConoce, libro(Paginas), Hazania , _ , _ ),
-    Anio >= AnioConoce,
-    Anio =< AnioConoce + Paginas,
     estaVivo(Persona, Anio).
 
 distintosDetalles(Personas1,Personas2,_,_):-
@@ -78,20 +87,6 @@ estatua(auberst, marmol, elHeroeDelSur, destruirSchlatOmnisciente, 1340).
 mantenimientoEstatua(elEquipoDeHeroes, 1400).
 mantenimientoEstatua(elEquipoDeHeroes, 1450).
 mantenimientoEstatua(elHeroeDelSur, 1410).
-
-recuerda(Persona, Hazania, Anio):-
-    habitante(Persona, Pueblo, _, _),
-    conmemoraFestivo(Pueblo, Hazania, AnioInicioConmemoracion),
-    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConocio),
-    Anio >= AnioConocio,
-    estaVivo(Persona, Anio).
-recuerda(Persona, Hazania, Anio):-
-    habitante(Persona, Pueblo, _, _),
-    estatua(Pueblo, _, Estatua, Hazania, AnioConstruccion),
-    anioEnQueConocioConmemoracion(Persona, AnioConstruccion, AnioConocio),
-    Anio >= AnioConocio,
-    estaVivo(Persona, Anio),
-    estatuaEnBuenEstado(Estatua, Anio).
 
 aniosMaximoSinMantenimiento(marmol, 30).
 aniosMaximoSinMantenimiento(bronce, 15).
