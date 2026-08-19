@@ -9,7 +9,7 @@ habitante(fern, weise, 1370, humano).
 habitante(stark, riegel, 1368, humano).
 habitante(lawine,auberst, 1372, humano).
 habitante(kanne, weise, 1365, humano).
-habitante(wirbel, weise, 1350, humano).
+habitante(wirbel, klares, 1350, humano).
 habitante(lernen, auberst, 1315, humano).
 habitante(frieren, weise, 100, elfo).
 habitante(eisen, riegel, 1150, enano).
@@ -195,4 +195,59 @@ test("Alguien conoce una conmemoración desde su inicio si ya había nacido cuan
 test("Nadie puede recordar una conmemoración en un año anterior a que esta comience a celebrarse", fail):-
     recuerda(frieren, destruirReyDemonio, 1339).
 
+% --- Tests Parte 2 ---
+
+test("Un pueblo recuerda una hazaña si al menos uno de sus habitantes la recuerda en ese año") :- 
+    seRecuerdaEnPueblo(weise, destruirReyDemonio, 1400),
+    seRecuerdaEnPueblo(klares, rescatarHermanaWirbel, 1395).
+test("Un pueblo no recuerda una hazaña si ningún habitante la conoce en ese año", fail) :- 
+    seRecuerdaEnPueblo(klares, destruirReyDemonio, 1395).
+
+test("Las páginas leídas en un pueblo suman las hojas de los libros conocidos por sus habitantes en ese año") :- 
+    paginasLeidasEnPueblo(weise, 1335, 100).
+test("Las páginas leídas en un pueblo son cero si ningún habitante conoció libros en ese año") :- 
+    paginasLeidasEnPueblo(weise, 1336, 0).
+
+test("Un pueblo es el más lector si la suma de sus páginas leídas es mayor o igual a la del resto de los pueblos") :- 
+    puebloMasLector(ende, 1400).
+
+test("Un pueblo es chismoso si recuerda hazañas pero absolutamente ninguna está corroborada") :- 
+    puebloChismoso(ende, 1420).
+test("Un pueblo no es chismoso si al menos una de las hazañas que recuerda sí está corroborada", fail) :- 
+    puebloChismoso(weise, 1400).
+
+
+test("Una hazaña es importante para un pueblo si todos sus habitantes vivos en ese año la recuerdan") :- 
+    hazaniaImportante(weise, destruirReyDemonio, 1400).
+test("Una hazaña no es importante para un pueblo si existe al menos un habitante vivo que no la recuerda", fail) :- 
+    hazaniaImportante(weise, recuperarGatoPerdido, 1400).
+
 :- end_tests(tpIntegrador).
+
+
+seRecuerdaEnPueblo(Pueblo, Hazania, Anio):-
+    habitante(Persona, Pueblo, _, _),
+    recuerda(Persona, Hazania, Anio).
+
+paginasLeidasEnPueblo(Pueblo, Anio, TotalPaginas):-
+    habitante(_, Pueblo, _, _),
+    findall(Paginas,
+        (habitante(Persona, Pueblo, _, _), conoce(Persona, Anio, libro(Paginas), _, _, _)),
+        ListaPaginas),
+    sum_list(ListaPaginas, TotalPaginas).
+
+puebloMasLector(Pueblo, Anio):-
+    paginasLeidasEnPueblo(Pueblo, Anio, MaxPaginas),
+    forall(paginasLeidasEnPueblo(_, Anio, OtrasPaginas), MaxPaginas >= OtrasPaginas).
+
+puebloChismoso(Pueblo, Anio):-
+    seRecuerdaEnPueblo(Pueblo, _, Anio),
+    forall(seRecuerdaEnPueblo(Pueblo, Hazania, Anio), not(estaCorroborada(Hazania))).
+
+hazaniaImportante(Pueblo, Hazania, Anio):-
+    seRecuerdaEnPueblo(Pueblo, Hazania, Anio),
+    forall(
+        (habitante(Persona, Pueblo, _, _), estaVivo(Persona, Anio)),
+        recuerda(Persona, Hazania, Anio)
+    ).
+
