@@ -222,6 +222,18 @@ test("Una hazaña es importante para un pueblo si todos sus habitantes vivos en 
 test("Una hazaña no es importante para un pueblo si existe al menos un habitante vivo que no la recuerda", fail) :- 
     hazaniaImportante(weise, recuperarGatoPerdido, 1400).
 
+test("Pueblo es musical si la mayoria de sus Hazañas recordadas son por cancion"):-
+    puebloMusical(auberst, 1395).
+
+test("Pueblo con menos de la mitad de hazañas recordadas musicalmente no es musical", fail):-
+    puebloMusical(weise, 1400).
+
+test(""):-
+    puebloTiemposSinPrecedentes(klares, 1395).
+
+test("", fail):-
+    puebloTiemposSinPrecedentes(weise, 1400).
+
 :- end_tests(tpIntegrador).
 
 
@@ -251,3 +263,25 @@ hazaniaImportante(Pueblo, Hazania, Anio):-
         recuerda(Persona, Hazania, Anio)
     ).
 
+sinRepetidos([], []).
+sinRepetidos([Cabeza|Cola], Filtrado):-
+    member(Cabeza, Cola),
+    sinRepetidos(Cola, Filtrado).
+sinRepetidos([Cabeza|Cola], [Cabeza|Filtrado]):-
+    not(member(Cabeza, Cola)),
+    sinRepetidos(Cola, Filtrado).
+
+
+puebloMusical(Pueblo, Anio):-
+    findall(Hazania, seRecuerdaEnPueblo(Pueblo, Hazania, Anio), Hazanias),
+    sinRepetidos(Hazanias, HazaniasFiltradas),
+    findall(Hazania, ( seRecuerdaEnPueblo(Pueblo, Hazania, Anio),conoce(_, _, cancion, Hazania, _, _) ), HazaniasCancion),
+    sinRepetidos(HazaniasCancion, HazaniasCancionFiltradas),
+
+    length(HazaniasFiltradas, Total),
+    length(HazaniasCancionFiltradas, ConCancion),
+
+    ConCancion * 2 > Total.
+
+puebloTiemposSinPrecedentes(Pueblo, Anio):-
+    forall( hazaniaImportante(Pueblo, Hazania, Anio),( habitante(Persona, Pueblo, _, _),conoce(Persona, _, presencio, Hazania, _, _) ) ).
