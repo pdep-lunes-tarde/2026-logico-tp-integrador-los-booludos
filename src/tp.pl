@@ -283,7 +283,7 @@ test("Una persona no fue inspirada si no conocemos ninguna hazaña que haya cono
     inspiro(_,eisen).
 
 test("Una cadena de inspiracion es valida cuando cada heroe inspiro al siguiente"):-
-    cadenaDeInspiracion(himmel, [himmel, fern, frieren, denken]).
+    cadenaDeInspiracion(fern, [fern, frieren, kanne]).
 
 test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail):-
     cadenaDeInspiracion(denken, [denken, frieren]).
