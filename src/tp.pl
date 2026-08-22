@@ -110,6 +110,7 @@ anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
     mantenimientoEstatua(NombreEstatua, AnioMantenimiento).
 
 %punto 5
+
 esHeroe(Personaje):-
     conoce(_,_,_,_,Personajes,_),
     member(Personaje, Personajes).
@@ -119,7 +120,7 @@ inspiro(Inspirador, Inspirado):-
     esHeroe(Inspirado),
     Inspirador \= Inspirado,
     conoce(Inspirado, _, _, _, PersonasQueRealizaron, _),
-    member(Inspirado, PersonasQueRealizaron).
+    member(Inspirador, PersonasQueRealizaron).
 
 heroesQueInspiraron(Inspirado, Inspiradores):-
     esHeroe(Inspirado),
