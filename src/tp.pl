@@ -114,30 +114,29 @@ esHeroe(Personaje):-
     conoce(_,_,_,_,Personajes,_),
     member(Personaje, Personajes).
 
-inspiro(Inspirado,HeroeQueInspiro):-
+inspiro(Inspirador, Inspirado):-
+    esHeroe(Inspirador),
     esHeroe(Inspirado),
-    esHeroe(HeroeQueInspiro),
-    Inspirado \= HeroeQueInspiro,
-    conoce(Inspirado,_,_,_,HeroesQueInspiraron,_),
-    member(HeroeQueInspiro,HeroesQueInspiraron).
-    
-heroesQueInspiraron(HeroeQueInspiro,HeroesInspirados):-
-    esHeroe(HeroeQueInspiro),
-    findall(HeroeInspirado, inspiro(HeroeInspirado,HeroeQueInspiro), HeroesInspirados).
+    Inspirador \= Inspirado,
+    conoce(Inspirado, _, _, _, PersonasQueRealizaron, _),
+    member(Inspirador, PersonasQueRealizaron).
 
-cadenaDeInspiracion(Heroe,Cadena):-
+heroesQueInspiraron(Inspirado, Inspiradores):-
+    esHeroe(Inspirado),
+    findall(Inspirador, inspiro(Inspirador, Inspirado), Inspiradores).
+
+cadenaDeInspiracion(Heroe, Cadena):-
     esHeroe(Heroe),
-    cadenaDeInspiracion(Heroe,[Heroe],Cadena).
-%ingreso Heroe en la cadena de heroes
-cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe,Inspirado]):-
-    inspiro(Inspirado,Heroe),
-    not (member(Inspirado,HeroesEnLaCadena)).
-%da una cadena de 2 elementos
-cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe|RestoDeHeroes]):-
-    inspiro(Inspirado,Heroe),
-    not (member(Inspirado,HeroesEnLaCadena)),
-    cadenaDeInspiracion(Inspirado,[Inspirado|HeroesEnLaCadena],RestoDeHeroes). % analiza los heroes inspirados
+    cadenaDeInspiracion(Heroe, [Heroe], Cadena).
 
+cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
+    inspiro(Heroe, Inspirado),
+    \+ member(Inspirado, Vistos).
+
+cadenaDeInspiracion(Heroe, Vistos, [Heroe|Resto]):-
+    inspiro(Heroe, Inspirado),
+    \+ member(Inspirado, Vistos),
+    cadenaDeInspiracion(Inspirado, [Inspirado|Vistos], Resto).
 
 % Tests 1
 
