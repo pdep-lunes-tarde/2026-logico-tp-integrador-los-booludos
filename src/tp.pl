@@ -275,22 +275,22 @@ test("Una persona no es un héroe si no participó en ninguna hazaña", fail):-
     esHeroe(wirbel).
 
 test("Frieren inspiró a Fern porque Fern conoce una hazaña en la que participó Frieren"):-
-    inspiro(fern, frieren).
+    inspiro(frieren, fern).
 
 test("Stark inspiró a Frieren porque Frieren conoce una hazaña en la que participó Stark"):-
-    inspiro(frieren, starkn).
+    inspiro(stark, frieren).
 
 test("Una persona no fue inspirada si no conocemos ninguna hazaña que haya conocido", fail):-
-    inspiro(eisen,_).
+    inspiro(_,eisen).
 
 test("Una cadena de inspiracion es valida cuando cada heroe inspiro al siguiente"):-
-    cadenaInspiracion(himmel, [himmel, fern, frieren, denken]).
+    cadenaDeInspiracion(himmel, [himmel, fern, frieren, denken]).
 
 test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail):-
-    cadenaInspiracion(denken, [denken, frieren]).
+    cadenaDeInspiracion(denken, [denken, frieren]).
 
 test("Una cadena de inspiracion no puede contener dos veces el mismo heroe", fail):-
-    cadenaInspiracion(frieren, [frieren, fern, frieren]).
+    cadenaDeInspiracion(frieren, [frieren, fern, frieren]).
 
 :- end_tests(tpIntegrador).
 
