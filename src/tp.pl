@@ -109,6 +109,36 @@ anioDeReferencia(_, AnioConstruccion, AnioConstruccion).
 anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
     mantenimientoEstatua(NombreEstatua, AnioMantenimiento).
 
+%punto 5
+esHeroe(Personaje):-
+    conoce(_,_,_,_,Personajes,_),
+    member(Personaje, Personajes).
+
+inspiro(Inspirado,HeroeQueInspiro):-
+    esHeroe(Inspirado),
+    esHeroe(HeroeQueInspiro),
+    Inspirado \= HeroeQueInspiro,
+    conoce(Inspirado,_,_,_,HeroesQueInspiraron,_),
+    member(HeroeQueInspiro,HeroesQueInspiraron).
+    
+heroesQueInspiraron(HeroeQueInspiro,HeroesInspirados):-
+    esHeroe(HeroeQueInspiro),
+    findall(HeroeInspirado, inspiro(HeroeInspirado,HeroeQueInspiro), HeroesInspirados).
+
+cadenaDeInspiracion(Heroe,Cadena):-
+    esHeroe(Heroe),
+    cadenaDeInspiracion(Heroe,[Heroe],Cadena).
+%ingreso Heroe en la cadena de heroes
+cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe,Inspirado]):-
+    inspiro(Heroe,Inspirado),
+    not (member(Inspirado,HeroesEnLaCadena)).
+%da una cadena de 2 elementos
+cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe|RestoDeHeroes]):-
+    inspiro(Heroe,Inspirado),
+    not (member(Inspirado,HeroesEnLaCadena)),
+    cadenaDeInspiracion(Inspirado,[Inspirado|HeroesEnLaCadena],RestoDeHeroes). % analiza los heroes inspirados
+
+
 % Tests 1
 
 :- begin_tests(tpIntegrador, []).
@@ -197,6 +227,8 @@ test("Nadie puede recordar una conmemoración en un año anterior a que esta com
 
 % --- Tests Parte 2 ---
 
+% Tests 4
+
 test("Un pueblo recuerda una hazaña si al menos uno de sus habitantes la recuerda en ese año") :- 
     seRecuerdaEnPueblo(weise, destruirReyDemonio, 1400),
     seRecuerdaEnPueblo(klares, rescatarHermanaWirbel, 1395).
@@ -233,6 +265,32 @@ test(""):-
 
 test("", fail):-
     puebloTiemposSinPrecedentes(weise, 1400).
+
+% Tests 5
+
+test("Una persona es un héroe si participó en al menos una hazaña que alguien conoce"):-
+    esHeroe(frieren).
+
+test("Una persona no es un héroe si no participó en ninguna hazaña", fail):-
+    esHeroe(wirbel).
+
+test("Frieren inspiró a Fern porque Fern conoce una hazaña en la que participó Frieren"):-
+    inspiro(fern, frieren).
+
+test("Stark inspiró a Frieren porque Frieren conoce una hazaña en la que participó Stark"):-
+    inspiro(frieren, starkn).
+
+test("Una persona no fue inspirada si no conocemos ninguna hazaña que haya conocido", fail):-
+    inspiro(eisen,_).
+
+test("Una cadena de inspiracion es valida cuando cada heroe inspiro al siguiente"):-
+    cadenaInspiracion(himmel, [himmel, fern, frieren, denken]).
+
+test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail):-
+    cadenaInspiracion(denken, [denken, frieren]).
+
+test("Una cadena de inspiracion no puede contener dos veces el mismo heroe", fail):-
+    cadenaInspiracion(frieren, [frieren, fern, frieren]).
 
 :- end_tests(tpIntegrador).
 
