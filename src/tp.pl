@@ -274,8 +274,8 @@ test("Una persona es un héroe si participó en al menos una hazaña que alguien
 test("Una persona no es un héroe si no participó en ninguna hazaña", fail):-
     esHeroe(wirbel).
 
-test("Frieren inspiró a Fern porque Fern conoce una hazaña en la que participó Frieren"):-
-    inspiro(frieren, fern).
+test("Fern inspiró a Frieren porque Frieren conoce una hazaña en la que participó Fern"):-
+    inspiro(fern, frieren).
 
 test("Stark inspiró a Frieren porque Frieren conoce una hazaña en la que participó Stark"):-
     inspiro(stark, frieren).
@@ -284,7 +284,7 @@ test("Una persona no fue inspirada si no conocemos ninguna hazaña que haya cono
     inspiro(_,eisen).
 
 test("Una cadena de inspiracion es valida cuando cada heroe inspiro al siguiente"):-
-    cadenaDeInspiracion(fern, [fern, frieren, kanne]).
+    cadenaDeInspiracion(fern, [fern, frieren, serie]).
 
 test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail):-
     cadenaDeInspiracion(denken, [denken, frieren]).
