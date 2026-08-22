@@ -119,11 +119,11 @@ inspiro(Inspirador, Inspirado):-
     esHeroe(Inspirado),
     Inspirador \= Inspirado,
     conoce(Inspirado, _, _, _, PersonasQueRealizaron, _),
-    member(Inspirador, PersonasQueRealizaron).
+    member(Inspirado, PersonasQueRealizaron).
 
 heroesQueInspiraron(Inspirado, Inspiradores):-
     esHeroe(Inspirado),
-    findall(Inspirador, inspiro(Inspirador, Inspirado), Inspiradores).
+    findall(Inspirador, inspiro(Inspirado, Inspirador), Inspiradores).
 
 cadenaDeInspiracion(Heroe, Cadena):-
     esHeroe(Heroe),
