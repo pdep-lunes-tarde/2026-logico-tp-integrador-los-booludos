@@ -130,11 +130,11 @@ cadenaDeInspiracion(Heroe,Cadena):-
     cadenaDeInspiracion(Heroe,[Heroe],Cadena).
 %ingreso Heroe en la cadena de heroes
 cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe,Inspirado]):-
-    inspiro(Heroe,Inspirado),
+    inspiro(Inspirado,Heroe),
     not (member(Inspirado,HeroesEnLaCadena)).
 %da una cadena de 2 elementos
 cadenaDeInspiracion(Heroe,HeroesEnLaCadena,[Heroe|RestoDeHeroes]):-
-    inspiro(Heroe,Inspirado),
+    inspiro(Inspirado,Heroe),
     not (member(Inspirado,HeroesEnLaCadena)),
     cadenaDeInspiracion(Inspirado,[Inspirado|HeroesEnLaCadena],RestoDeHeroes). % analiza los heroes inspirados
 
