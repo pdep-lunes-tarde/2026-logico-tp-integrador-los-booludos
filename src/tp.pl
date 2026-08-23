@@ -99,7 +99,6 @@ conmemoracionVigente(estatua(_, NombreEstatua), Anio):-
 
 estatuaEnBuenEstado(NombreEstatua, Anio):-
     conmemora(_, AnioConstruccion, estatua(Material, NombreEstatua), _, _, _),
-    AnioConstruccion =< Anio,
     aniosMaximoSinMantenimiento(Material, AniosMaximos),
     anioDeReferencia(NombreEstatua, AnioConstruccion, AnioReferencia),
     AnioReferencia =< Anio,
@@ -109,18 +108,23 @@ anioDeReferencia(_, AnioConstruccion, AnioConstruccion).
 anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
     mantenimientoEstatua(NombreEstatua, AnioMantenimiento).
 
-%punto 5
+% Parte 2
+
+% Punto 5
 
 esHeroe(Personaje):-
     conoce(_,_,_,_,Personajes,_),
+    member(Personaje, Personajes).
+esHeroe(Personaje):-
+    conmemora(_,_,_,_,Personajes,_),
     member(Personaje, Personajes).
 
 inspiro(Inspirador, Inspirado):-
     esHeroe(Inspirador),
     esHeroe(Inspirado),
     Inspirador \= Inspirado,
-    conoce(Inspirado, _, _, _, PersonasQueRealizaron, _),
-    member(Inspirador, PersonasQueRealizaron).
+    conocioAlgunaVez(Inspirado, Hazania),
+    participo(Inspirador, Hazania).
 
 heroesQueInspiraron(Inspirado, Inspiradores):-
     esHeroe(Inspirado),
@@ -139,6 +143,50 @@ cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
     inspiro(Heroe, Inspirado),
     \+ member(Inspirado, Vistos).
 
+conocioAlgunaVez(Persona, Hazania):-
+    conoce(Persona, _, _, Hazania, _, _).
+conocioAlgunaVez(Persona, Hazania):-
+    habitante(Persona, Pueblo, _, _),
+    conmemora(Pueblo, _, _, Hazania, _, _).
+
+participo(Persona, Hazania):-
+    conoce(_, _, _, Hazania, Personajes, _),
+    member(Persona, Personajes).
+participo(Persona, Hazania):-
+    conmemora(_, _, _, Hazania, Personajes, _),
+    member(Persona, Personajes).
+
+% Punto 6
+
+dreamTeam(Heroe, Equipo):-
+    esHeroe(Heroe),
+    findall(Antecesor, esAntecesor(Antecesor, Heroe), AntecesoresConRepetidos),
+    list_to_set(AntecesoresConRepetidos, Antecesores),
+    subconjunto(Antecesores, SubAntecesores),
+    SubAntecesores \= [],
+    list_to_set([Heroe|SubAntecesores], EquipoGenerado),
+    mismoConjunto(EquipoGenerado, Equipo).
+
+esAntecesor(Antecesor, Heroe):-
+    cadenaDeInspiracion(Antecesor, Cadena),
+    member(Heroe, Cadena),
+    Antecesor \= Heroe.
+
+subconjunto([], []).
+subconjunto([Antecesor|RestoAntecesores], [Antecesor|SubconjuntoRestoAntecesores]):-
+    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
+subconjunto([_|RestoAntecesores], SubconjuntoRestoAntecesores):-
+    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
+
+mismoConjunto(Lista1, Lista2):-
+    length(Lista1, N),
+    length(Lista2, N),
+    contieneATodos(Lista1, Lista2).
+
+contieneATodos([], _).
+contieneATodos([Elemento|Resto], Lista):-
+    member(Elemento, Lista),
+    contieneATodos(Resto, Lista).
 
 % Tests 1
 
@@ -292,6 +340,20 @@ test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail)
 
 test("Una cadena de inspiracion no puede contener dos veces el mismo heroe", fail):-
     cadenaDeInspiracion(frieren, [frieren, fern, frieren]).
+
+% Tests 6
+
+test("Un equipo formado por un héroe junto con al menos uno de sus antecesores es un dream team válido"):-
+    dreamTeam(fern, [fern, himmel]).
+
+test("La validez de un dream team no depende del orden en que aparecen sus integrantes"):-
+    dreamTeam(fern, [himmel, fern]).
+
+test("Un equipo formado únicamente por el héroe, sin ningún antecesor, no es un dream team válido", fail):-
+    dreamTeam(fern, [fern]).
+
+test("Un equipo que no incluye al héroe para el que se arma no es un dream team válido", fail):-
+    dreamTeam(fern, [frieren]).
 
 :- end_tests(tpIntegrador).
 
