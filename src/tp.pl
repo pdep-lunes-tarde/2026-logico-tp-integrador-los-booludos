@@ -130,14 +130,15 @@ cadenaDeInspiracion(Heroe, Cadena):-
     esHeroe(Heroe),
     cadenaDeInspiracion(Heroe, [Heroe], Cadena).
 
-cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
-    inspiro(Heroe, Inspirado),
-    \+ member(Inspirado, Vistos).
-
 cadenaDeInspiracion(Heroe, Vistos, [Heroe|Resto]):-
     inspiro(Heroe, Inspirado),
     \+ member(Inspirado, Vistos),
     cadenaDeInspiracion(Inspirado, [Inspirado|Vistos], Resto).
+
+cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
+    inspiro(Heroe, Inspirado),
+    \+ member(Inspirado, Vistos).
+
 
 % Tests 1
 
@@ -284,7 +285,7 @@ test("Una persona no fue inspirada si no conocemos ninguna hazaña que haya cono
     inspiro(_,eisen).
 
 test("Una cadena de inspiracion es valida cuando cada heroe inspiro al siguiente"):-
-    cadenaDeInspiracion(fern, [fern, frieren, serie]).
+    cadenaDeInspiracion(stark, [stark, frieren, serie]).
 
 test("si un heroe no conoce hazañas de otro entonces este no lo inspiro", fail):-
     cadenaDeInspiracion(denken, [denken, frieren]).
