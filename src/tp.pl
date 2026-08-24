@@ -18,15 +18,15 @@ esperanzaVida(humano, 80).
 esperanzaVida(enano, 350).
 
 estaVivo(Persona, Anio):-
-    habitante(Persona, _, Nacimiento, elfo),
-    Anio >= Nacimiento.
-
-estaVivo(Persona, Anio):-
-    habitante(Persona, _, Nacimiento, Raza),
-    Raza \= elfo,
-    esperanzaVida(Raza, AniosMaximos),
+    habitante(Persona, _, Nacimiento, _),
     Anio >= Nacimiento,
-    Anio =< Nacimiento + AniosMaximos. 
+    not(fallecio(Persona, Anio)).
+
+fallecio(Persona, Anio):-
+    habitante(Persona, _, Nacimiento, Raza),
+    esperanzaVida(Raza, AniosMaximo),
+    Anio > Nacimiento + AniosMaximo.
+
 
 % Punto 2
 
