@@ -36,7 +36,14 @@ conoce(lawine, 1393, cancion , destruirAura , [frieren] , weise).
 conoce(voll, 1400, libro(50) , destruirAura , [denken] , auberst).
 conoce(serie, 1335, libro(100) , destruirReyDemonio , [frieren, himmel , heiter, eisen] , ende).
 conoce(kanne, 1375, presencio , recuperarGatoPerdido , [himmel, frieren] , weise).
+conoce(Persona, AnioConoce, Tipo, Hazania, Personajes, DondeOcurrio):-
+    habitante(Persona, Pueblo, _, _),
+    conmemora(Pueblo, AnioInicioConmemoracion, Tipo, Hazania, Personajes, DondeOcurrio),
+    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConoce).
 
+dura(festivo, _, _).
+dura(estatua(_, NombreEstatua), _, AnioActual):-
+    estatuaEnBuenEstado(NombreEstatua, AnioActual).
 dura(presencio, _ ,_).
 dura(cancion, Anio, AnioActual):-
     AnioActual =< Anio + 15.
@@ -46,12 +53,7 @@ dura(libro(Paginas), Anio, AnioActual):-
 perdura(Persona,Hazania,Anio,AnioConoce):-
     conoce(Persona, AnioConoce, Tipo, Hazania, _, _),
     dura(Tipo, AnioConoce, Anio).
-perdura(Persona,Hazania,Anio,AnioConoce):-
-    habitante(Persona, Pueblo, _, _),
-    conmemora(Pueblo, AnioInicioConmemoracion, Tipo, Hazania, _, _),
-    anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioConoce),
-    conmemoracionVigente(Tipo, Anio).
-
+    
 recuerda(Persona, Hazania, Anio) :-
     perdura(Persona,Hazania,Anio,AnioConoce),
     Anio >= AnioConoce,
@@ -93,10 +95,6 @@ anioEnQueConocioConmemoracion(Persona, AnioInicioConmemoracion, AnioNacimiento):
     habitante(Persona, _, AnioNacimiento, _),
     AnioNacimiento > AnioInicioConmemoracion.
 
-conmemoracionVigente(festivo, _).
-conmemoracionVigente(estatua(_, NombreEstatua), Anio):-
-    estatuaEnBuenEstado(NombreEstatua, Anio).
-
 estatuaEnBuenEstado(NombreEstatua, Anio):-
     conmemora(_, AnioConstruccion, estatua(Material, NombreEstatua), _, _, _),
     aniosMaximoSinMantenimiento(Material, AniosMaximos),
@@ -114,9 +112,6 @@ anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
 
 esHeroe(Personaje):-
     conoce(_,_,_,_,Personajes,_),
-    member(Personaje, Personajes).
-esHeroe(Personaje):-
-    conmemora(_,_,_,_,Personajes,_),
     member(Personaje, Personajes).
 
 inspiro(Inspirador, Inspirado):-
@@ -136,46 +131,47 @@ cadenaDeInspiracion(Heroe, Cadena):-
 
 cadenaDeInspiracion(Heroe, Vistos, [Heroe|Resto]):-
     inspiro(Heroe, Inspirado),
-    \+ member(Inspirado, Vistos),
+        not(member(Inspirado, Vistos)),
     cadenaDeInspiracion(Inspirado, [Inspirado|Vistos], Resto).
 
 cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
     inspiro(Heroe, Inspirado),
-    \+ member(Inspirado, Vistos).
+        not(member(Inspirado, Vistos)),
 
 conocioAlgunaVez(Persona, Hazania):-
     conoce(Persona, _, _, Hazania, _, _).
-conocioAlgunaVez(Persona, Hazania):-
-    habitante(Persona, Pueblo, _, _),
-    conmemora(Pueblo, _, _, Hazania, _, _).
 
 participo(Persona, Hazania):-
     conoce(_, _, _, Hazania, Personajes, _),
-    member(Persona, Personajes).
-participo(Persona, Hazania):-
-    conmemora(_, _, _, Hazania, Personajes, _),
     member(Persona, Personajes).
 
 % Punto 6
 
 dreamTeam(Heroe, Equipo):-
     esHeroe(Heroe),
-    findall(Antecesor, esAntecesor(Antecesor, Heroe), AntecesoresConRepetidos),
+    findall(Antecesor, (esAntecesor(Antecesor, Heroe), Antecesor \= Heroe), AntecesoresConRepetidos),
     list_to_set(AntecesoresConRepetidos, Antecesores),
     subconjunto(Antecesores, SubAntecesores),
     SubAntecesores \= [],
-    list_to_set([Heroe|SubAntecesores], EquipoGenerado),
-    mismoConjunto(EquipoGenerado, Equipo).
+    mismoConjunto([Heroe|SubAntecesores], Equipo).
 
 esAntecesor(Antecesor, Heroe):-
-    cadenaDeInspiracion(Antecesor, Cadena),
-    member(Heroe, Cadena),
-    Antecesor \= Heroe.
+    esAntecesor(Antecesor, Heroe, [Heroe]).
+esAntecesor(Antecesor, Heroe, _):-
+    findall(Inspiradores, inspiro(Inspiradores, Heroe), InspiradoresRepetidos),
+    list_to_set(InspiradoresRepetidos, InspiradoresUnicos),
+    member(Antecesor, InspiradoresUnicos).
+esAntecesor(Antecesor, Heroe, Vistos):-
+    findall(Inspiradores, inspiro(Inspiradores, Heroe), InspiradoresRepetidos),
+    list_to_set(InspiradoresRepetidos, InspiradoresUnicos),
+    member(Intermedio, InspiradoresUnicos),
+    not(member(Intermedio, Vistos)),
+    esAntecesor(Antecesor, Intermedio, [Intermedio|Vistos]).
 
 subconjunto([], []).
-subconjunto([Antecesor|RestoAntecesores], [Antecesor|SubconjuntoRestoAntecesores]):-
-    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
 subconjunto([_|RestoAntecesores], SubconjuntoRestoAntecesores):-
+    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
+subconjunto([Antecesor|RestoAntecesores], [Antecesor|SubconjuntoRestoAntecesores]):-
     subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
 
 mismoConjunto(Lista1, Lista2):-
