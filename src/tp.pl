@@ -50,10 +50,10 @@ dura(cancion, Anio, AnioActual):-
 dura(libro(Paginas), Anio, AnioActual):-
     AnioActual =< Anio + Paginas.
 
-perdura(Persona,Hazania,Anio,AnioConoce):-
+perdura(Persona, Hazania, Anio, AnioConoce):-
     conoce(Persona, AnioConoce, Tipo, Hazania, _, _),
     dura(Tipo, AnioConoce, Anio).
-    
+
 recuerda(Persona, Hazania, Anio) :-
     perdura(Persona,Hazania,Anio,AnioConoce),
     Anio >= AnioConoce,
@@ -131,12 +131,12 @@ cadenaDeInspiracion(Heroe, Cadena):-
 
 cadenaDeInspiracion(Heroe, Vistos, [Heroe|Resto]):-
     inspiro(Heroe, Inspirado),
-        not(member(Inspirado, Vistos)),
+    not(member(Inspirado, Vistos)),
     cadenaDeInspiracion(Inspirado, [Inspirado|Vistos], Resto).
 
 cadenaDeInspiracion(Heroe, Vistos, [Heroe, Inspirado]):-
     inspiro(Heroe, Inspirado),
-        not(member(Inspirado, Vistos)),
+    not(member(Inspirado, Vistos)).
 
 conocioAlgunaVez(Persona, Hazania):-
     conoce(Persona, _, _, Hazania, _, _).
@@ -352,7 +352,6 @@ test("Un equipo que no incluye al héroe para el que se arma no es un dream team
     dreamTeam(fern, [frieren]).
 
 :- end_tests(tpIntegrador).
-
 
 seRecuerdaEnPueblo(Pueblo, Hazania, Anio):-
     habitante(Persona, Pueblo, _, _),
