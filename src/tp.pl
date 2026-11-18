@@ -1,5 +1,3 @@
-% Parte 1
-
 % Punto 1
 
 habitante(denken, auberst, 1290, humano).
@@ -111,15 +109,16 @@ anioDeReferencia(NombreEstatua, _, AnioMantenimiento):-
 % Punto 5
 
 esHeroe(Personaje):-
-    conoce(_,_,_,_,Personajes,_),
-    member(Personaje, Personajes).
+    distinct(Personaje, (conoce(_,_,_,_,Personajes,_), member(Personaje, Personajes))).
 
 inspiro(Inspirador, Inspirado):-
-    esHeroe(Inspirador),
-    esHeroe(Inspirado),
-    Inspirador \= Inspirado,
-    conocioAlgunaVez(Inspirado, Hazania),
-    participo(Inspirador, Hazania).
+    distinct(inspiracion(Inspirador, Inspirado), (
+        esHeroe(Inspirador),
+        esHeroe(Inspirado),
+        Inspirador \= Inspirado,
+        conocioAlgunaVez(Inspirado, Hazania),
+        participo(Inspirador, Hazania)
+    )).
 
 heroesQueInspiraron(Inspirado, Inspiradores):-
     esHeroe(Inspirado),
@@ -147,42 +146,31 @@ participo(Persona, Hazania):-
 
 % Punto 6
 
-dreamTeam(Heroe, Equipo):-
-    esHeroe(Heroe),
-    findall(Antecesor, (esAntecesor(Antecesor, Heroe), Antecesor \= Heroe), AntecesoresConRepetidos),
-    list_to_set(AntecesoresConRepetidos, Antecesores),
-    subconjunto(Antecesores, SubAntecesores),
-    SubAntecesores \= [],
-    mismoConjunto([Heroe|SubAntecesores], Equipo).
+esAntecesor(Antecesores, Heroe):-
+    cadenaDeInspiracion(_, Cadena),
+    append(Antecesores, [Heroe], Cadena).
 
-esAntecesor(Antecesor, Heroe):-
-    esAntecesor(Antecesor, Heroe, [Heroe]).
-esAntecesor(Antecesor, Heroe, _):-
-    findall(Inspiradores, inspiro(Inspiradores, Heroe), InspiradoresRepetidos),
-    list_to_set(InspiradoresRepetidos, InspiradoresUnicos),
-    member(Antecesor, InspiradoresUnicos).
-esAntecesor(Antecesor, Heroe, Vistos):-
-    findall(Inspiradores, inspiro(Inspiradores, Heroe), InspiradoresRepetidos),
-    list_to_set(InspiradoresRepetidos, InspiradoresUnicos),
-    member(Intermedio, InspiradoresUnicos),
-    not(member(Intermedio, Vistos)),
-    esAntecesor(Antecesor, Intermedio, [Intermedio|Vistos]).
+dreamTeam(Heroe, Equipo):-
+    esAntecesor(Antecesores, Heroe),
+    subconjunto(Antecesores, AntecesoresElegidos),
+    AntecesoresElegidos \= [],
+    mismoConjunto([Heroe|AntecesoresElegidos], Equipo).
 
 subconjunto([], []).
-subconjunto([_|RestoAntecesores], SubconjuntoRestoAntecesores):-
-    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
-subconjunto([Antecesor|RestoAntecesores], [Antecesor|SubconjuntoRestoAntecesores]):-
-    subconjunto(RestoAntecesores, SubconjuntoRestoAntecesores).
+subconjunto([_|RestoAntecesores], AntecesoresElegidos):-
+    subconjunto(RestoAntecesores, AntecesoresElegidos).
+subconjunto([Antecesor|RestoAntecesores], [Antecesor|AntecesoresElegidos]):-
+    subconjunto(RestoAntecesores, AntecesoresElegidos).
 
-mismoConjunto(Lista1, Lista2):-
-    length(Lista1, N),
-    length(Lista2, N),
-    contieneATodos(Lista1, Lista2).
+mismoConjunto(Integrantes, Equipo):-
+    length(Integrantes, CantidadIntegrantes),
+    length(Equipo, CantidadIntegrantes),
+    contieneATodos(Integrantes, Equipo).
 
 contieneATodos([], _).
-contieneATodos([Elemento|Resto], Lista):-
-    member(Elemento, Lista),
-    contieneATodos(Resto, Lista).
+contieneATodos([Integrante|RestoIntegrantes], Equipo):-
+    member(Integrante, Equipo),
+    contieneATodos(RestoIntegrantes, Equipo).
 
 % Tests 1
 
@@ -305,10 +293,10 @@ test("Pueblo es musical si la mayoria de sus Hazañas recordadas son por cancion
 test("Pueblo con menos de la mitad de hazañas recordadas musicalmente no es musical", fail):-
     puebloMusical(weise, 1400).
 
-test(""):-
+test("Un pueblo vive tiempos sin precedentes si todas sus hazañas importantes las presenció alguien del pueblo"):-
     puebloTiemposSinPrecedentes(klares, 1395).
 
-test("", fail):-
+test("Un pueblo no vive tiempos sin precedentes si nadie del pueblo presenció alguna de sus hazañas importantes", fail):-
     puebloTiemposSinPrecedentes(weise, 1400).
 
 % Tests 5
@@ -353,6 +341,7 @@ test("Un equipo que no incluye al héroe para el que se arma no es un dream team
 
 :- end_tests(tpIntegrador).
 
+
 seRecuerdaEnPueblo(Pueblo, Hazania, Anio):-
     habitante(Persona, Pueblo, _, _),
     recuerda(Persona, Hazania, Anio).
@@ -389,6 +378,7 @@ sinRepetidos([Cabeza|Cola], [Cabeza|Filtrado]):-
 
 
 puebloMusical(Pueblo, Anio):-
+    distinct(Pueblo, habitante(_, Pueblo, _, _)),
     findall(Hazania, seRecuerdaEnPueblo(Pueblo, Hazania, Anio), Hazanias),
     sinRepetidos(Hazanias, HazaniasFiltradas),
     findall(Hazania, ( seRecuerdaEnPueblo(Pueblo, Hazania, Anio),conoce(_, _, cancion, Hazania, _, _) ), HazaniasCancion),
@@ -400,4 +390,5 @@ puebloMusical(Pueblo, Anio):-
     ConCancion * 2 > Total.
 
 puebloTiemposSinPrecedentes(Pueblo, Anio):-
+    distinct(Pueblo, habitante(_, Pueblo, _, _)),
     forall( hazaniaImportante(Pueblo, Hazania, Anio),( habitante(Persona, Pueblo, _, _),conoce(Persona, _, presencio, Hazania, _, _) ) ).
