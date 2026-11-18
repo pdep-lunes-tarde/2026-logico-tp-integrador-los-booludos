@@ -3,6 +3,10 @@
 ## Integrantes
 
 **Equipo:** 
+- Abram Puga Joaquin 233.656-0
+- Alex Kuno Rodriguez 222.440-9
+- Ezequiel Heredia 222.399-5
+- Lautaro Ismael Espinoza 233.854-3
 
 ## Fecha de entrega de parte 1
 
